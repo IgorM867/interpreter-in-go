@@ -40,8 +40,8 @@ const (
 	CloseParen          // )
 	OpenBrace           // {
 	CloseBrace          // }
-	OpenBracket         //[
-	CloseBracket        //]
+	OpenBracket         // [
+	CloseBracket        // ]
 	EOF                 // Signified the end of file
 )
 
