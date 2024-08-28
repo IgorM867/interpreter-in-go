@@ -37,6 +37,7 @@ const (
 	Semicolon           // ;
 	DoubleQuote         // "
 	Not                 // !
+	Comment             // //
 	OpenParen           // (
 	CloseParen          // )
 	OpenBrace           // {
@@ -57,7 +58,7 @@ var currentLine uint64 = 1
 
 func (tokenType TokenType) String() string {
 
-	return []string{"Number", "String", "Identifier", "Let", "Const", "Fn", "If", "Else", "While", "BinaryOperator", "Equals", "EqualsEquals", "NotEquals", "LessThanOrEquals", "GreaterThanOrEquals", "LessThan", "GreaterThan", "Dot", "Coma", "Colon", "Semicolon", "DoubleQuote", "Not", "OpenParen", "CloseParen", "OpenBrace", "CloseBrace", "OpenBracket", "CloseBracket", "EOF"}[tokenType]
+	return []string{"Number", "String", "Identifier", "Let", "Const", "Fn", "If", "Else", "While", "BinaryOperator", "Equals", "EqualsEquals", "NotEquals", "LessThanOrEquals", "GreaterThanOrEquals", "LessThan", "GreaterThan", "Dot", "Coma", "Colon", "Semicolon", "DoubleQuote", "Not", "Comment", "OpenParen", "CloseParen", "OpenBrace", "CloseBrace", "OpenBracket", "CloseBracket", "EOF"}[tokenType]
 }
 func newToken(value string, tType TokenType) Token {
 	return Token{Value: value, TokenType: tType, Line: currentLine}
@@ -107,8 +108,17 @@ func Tokenize(sourceCode string) []Token {
 			tokens = append(tokens, newToken(src[i], OpenBracket))
 		} else if src[i] == "]" {
 			tokens = append(tokens, newToken(src[i], CloseBracket))
-		} else if src[i] == "+" || src[i] == "-" || src[i] == "*" || src[i] == "/" || src[i] == "%" {
+		} else if src[i] == "+" || src[i] == "-" || src[i] == "*" || src[i] == "%" {
 			tokens = append(tokens, newToken(src[i], BinaryOperator))
+		} else if src[i] == "/" {
+			if i+1 < len(src) && src[i+1] == "/" {
+				i++
+				for i < len(src) && src[i] != "\n" {
+					i++
+				}
+			} else {
+				tokens = append(tokens, newToken(src[i], BinaryOperator))
+			}
 		} else if src[i] == "=" {
 			if i+1 < len(src) && src[i+1] == "=" {
 				tokens = append(tokens, newToken("==", EqualsEquals))

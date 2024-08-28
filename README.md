@@ -66,3 +66,9 @@ fn add(a, b) {
 print()
 println()
 ```
+
+### Comments
+
+```
+//comment
+```
