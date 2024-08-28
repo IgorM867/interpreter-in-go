@@ -73,6 +73,9 @@ type NumericLiteral struct {
 type StringLiteral struct {
 	value string
 }
+type ArrayLiteral struct {
+	elements []Expr
+}
 
 func (p Program) evaluate(env *Env) RuntimeVal {
 	var lastEvaluated RuntimeVal = NullVal{}
@@ -189,38 +192,53 @@ func (c CallExpr) evaluate(env *Env) RuntimeVal {
 	panic("Unreachable code")
 }
 func (m MemberExpr) evaluate(env *Env) RuntimeVal {
-	obj, ok := m.object.evaluate(env).(Object)
-	if !ok {
-		fmt.Printf("%v is not an object \n", m.object.evaluate(env))
-		os.Exit(1)
-	}
+	obj := m.object.evaluate(env)
 
-	if !m.computed {
-		propName, ok := m.property.(Identifier)
+	switch obj := obj.(type) {
+	case Object:
+		if !m.computed {
+			propName, ok := m.property.(Identifier)
+			if !ok {
+				fmt.Println("Invalid property")
+				os.Exit(1)
+			}
+			prop, ok := obj.properties[propName.symbol]
+			if !ok {
+				fmt.Printf("Propety %v does not exist\n", propName.symbol)
+				os.Exit(1)
+			}
+
+			return prop
+		}
+
+		propName, ok := m.property.evaluate(env).(StringVaL)
 		if !ok {
-			fmt.Println("Invalid property")
+			fmt.Printf("Object property must me of type string. %v\n", propName)
 			os.Exit(1)
 		}
-		prop, ok := obj.properties[propName.symbol]
+		prop, ok := obj.properties[propName.value]
 		if !ok {
-			fmt.Printf("Propety %v does not exist\n", propName.symbol)
+			fmt.Printf("Propety %v does not exist\n", propName.value)
 			os.Exit(1)
 		}
-
 		return prop
-	}
+	case Array:
+		if !m.computed {
+			panic("To get array element you need to use []")
+		}
+		prop := m.property.evaluate(env)
+		index, ok := prop.(NumberVal)
+		if !ok {
+			panic(fmt.Sprintf("Expected number as an array index and get: %v", prop.getType()))
+		}
+		if index.value >= int64(len(obj.elements)) {
+			panic(fmt.Sprintf("Array index out of bounds. Attempted to access index %v in an array of size %v.", index.value, len(obj.elements)))
+		}
+		return obj.elements[index.value]
 
-	propName, ok := m.property.evaluate(env).(StringVaL)
-	if !ok {
-		fmt.Printf("Object property must me of type string. %v\n", propName)
-		os.Exit(1)
+	default:
+		panic(fmt.Sprintf("Unsuported member expression: %v is not an object or array\n", obj.getType()))
 	}
-	prop, ok := obj.properties[propName.value]
-	if !ok {
-		fmt.Printf("Propety %v does not exist\n", propName.value)
-		os.Exit(1)
-	}
-	return prop
 }
 func (u UnaryExpression) evaluate(env *Env) RuntimeVal {
 
@@ -344,6 +362,16 @@ func (n NumericLiteral) evaluate(_ *Env) RuntimeVal {
 func (s StringLiteral) evaluate(env *Env) RuntimeVal {
 	return StringVaL(s)
 }
+func (a ArrayLiteral) evaluate(env *Env) RuntimeVal {
+	elemements := make([]RuntimeVal, len(a.elements))
+
+	for i, elem := range a.elements {
+		elemements[i] = elem.evaluate(env)
+	}
+
+	return Array{elemements}
+}
+
 func (p Program) String() string {
 	str := ""
 	for _, v := range p.body {

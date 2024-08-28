@@ -32,6 +32,9 @@ type Function struct {
 	declarationEnv *Env
 	body           []Stmt
 }
+type Array struct {
+	elements []RuntimeVal
+}
 
 func (lhs NumberVal) binaryOperation(operator string, rhs NumberVal) NumberVal {
 	switch operator {
@@ -81,6 +84,9 @@ func (NativeFn) getType() string {
 func (Function) getType() string {
 	return "Function"
 }
+func (Array) getType() string {
+	return "Array"
+}
 func (num NumberVal) String() string {
 	return colors.GreenString(fmt.Sprintf("%d", num.value))
 }
@@ -114,6 +120,10 @@ func (NativeFn) String() string {
 func (Function) String() string {
 	return "[Function]"
 }
+func (array Array) String() string {
+	return fmt.Sprintf("%v", array.elements)
+}
+
 func compareTypes(val1, val2 RuntimeVal) bool {
 	return fmt.Sprintf("%T", val1) == fmt.Sprintf("%T", val2)
 }

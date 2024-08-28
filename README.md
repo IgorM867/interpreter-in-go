@@ -16,6 +16,7 @@ MyGoInterpreter is a custom programming language interpreter written in Go. The 
 ```
 let x = 10;
 const y = x + 5;
+const arr = [1,2,3];
 ```
 
 ### Arithmetic Operations

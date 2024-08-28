@@ -304,6 +304,11 @@ func (p *Parser) parsePrimaryExpr() Expr {
 
 		}
 		return value
+	case lexer.OpenBracket:
+		p.eat()
+		elements := p.parseArgsList()
+		p.expect(lexer.CloseBracket)
+		return ArrayLiteral{elements}
 	default:
 		token := p.eat()
 		fmt.Printf("Unexpected token found during parsing: '%v' Line:%v\n", token.Value, token.Line)
