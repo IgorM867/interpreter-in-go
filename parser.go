@@ -55,6 +55,8 @@ func (p *Parser) parseStmt() Stmt {
 		return p.parseFnDecralation()
 	} else if p.isTokenType(lexer.If) {
 		return p.parseIfStmt()
+	} else if p.isTokenType(lexer.While) {
+		return p.parseWhileStmt()
 	}
 
 	return p.parseExpr()
@@ -131,6 +133,22 @@ func (p *Parser) parseIfStmt() IfStmt {
 	}
 
 	return IfStmt{condition, body, alternative}
+}
+func (p *Parser) parseWhileStmt() WhileStmt {
+	p.eat()
+
+	p.expect(lexer.OpenParen)
+	condition := p.parseExpr()
+	p.expect(lexer.CloseParen)
+
+	p.expect(lexer.OpenBrace)
+	body := make([]Stmt, 0)
+	for !p.isTokenType(lexer.EOF, lexer.CloseBrace) {
+		body = append(body, p.parseStmt())
+	}
+	p.expect(lexer.CloseBrace)
+
+	return WhileStmt{condition, body}
 }
 func (p *Parser) parseExpr() Expr {
 

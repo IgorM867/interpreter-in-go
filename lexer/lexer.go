@@ -21,6 +21,7 @@ const (
 	Fn
 	If
 	Else
+	While
 	// Grouping * Operators
 	BinaryOperator      // + - * / %
 	Equals              // =
@@ -51,12 +52,12 @@ type Token struct {
 	Line      uint64
 }
 
-var KEYWORDS = map[string]TokenType{"let": Let, "const": Const, "fn": Fn, "if": If, "else": Else}
+var KEYWORDS = map[string]TokenType{"let": Let, "const": Const, "fn": Fn, "if": If, "else": Else, "while": While}
 var currentLine uint64 = 1
 
 func (tokenType TokenType) String() string {
 
-	return []string{"Number", "String", "Identifier", "Let", "Const", "Fn", "If", "Else", "BinaryOperator", "Equals", "EqualsEquals", "NotEquals", "LessThanOrEquals", "GreaterThanOrEquals", "LessThan", "GreaterThan", "Dot", "Coma", "Colon", "Semicolon", "DoubleQuote", "Not", "OpenParen", "CloseParen", "OpenBrace", "CloseBrace", "OpenBracket", "CloseBracket", "EOF"}[tokenType]
+	return []string{"Number", "String", "Identifier", "Let", "Const", "Fn", "If", "Else", "While", "BinaryOperator", "Equals", "EqualsEquals", "NotEquals", "LessThanOrEquals", "GreaterThanOrEquals", "LessThan", "GreaterThan", "Dot", "Coma", "Colon", "Semicolon", "DoubleQuote", "Not", "OpenParen", "CloseParen", "OpenBrace", "CloseBrace", "OpenBracket", "CloseBracket", "EOF"}[tokenType]
 }
 func newToken(value string, tType TokenType) Token {
 	return Token{Value: value, TokenType: tType, Line: currentLine}

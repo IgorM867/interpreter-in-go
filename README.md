@@ -42,6 +42,16 @@ if (x > 10) {
 }
 ```
 
+### Loops
+
+```
+let i = 0;
+while (i < 10) {
+    println(i)
+    i = i + 1
+}
+```
+
 ### Functions
 
 ```

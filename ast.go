@@ -30,6 +30,10 @@ type IfStmt struct {
 	body        []Stmt
 	alternative []Stmt
 }
+type WhileStmt struct {
+	condition Expr
+	body      []Stmt
+}
 type AssigmentExpr struct {
 	assigne Expr
 	value   Expr
@@ -127,6 +131,22 @@ func (i IfStmt) evaluate(env *Env) RuntimeVal {
 		}
 	}
 
+	return NullVal{}
+}
+func (w WhileStmt) evaluate(env *Env) RuntimeVal {
+	condition, ok := w.condition.evaluate(env).(BooleanVal)
+	if !ok {
+		fmt.Println("While condition must be a boolean.")
+	}
+
+	for condition.value {
+		scope := newScope(env)
+		for _, stmt := range w.body {
+			stmt.evaluate(&scope)
+		}
+
+		condition = w.condition.evaluate(env).(BooleanVal)
+	}
 	return NullVal{}
 }
 func (a AssigmentExpr) evaluate(env *Env) RuntimeVal {
